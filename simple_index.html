@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Business Directory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff9933 0%, #ffffff 50%, #138808 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #ff6b35;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .search-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        input, select {
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff6b35, #ff9933);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        }
+        
+        .companies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .company-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #ff6b35;
+        }
+        
+        .company-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .company-name {
+            color: #ff6b35;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .company-info {
+            margin-bottom: 15px;
+        }
+        
+        .info-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            width: 80px;
+            flex-shrink: 0;
+        }
+        
+        .info-value {
+            color: #333;
+        }
+        
+        .state-badge {
+            background: linear-gradient(45deg, #138808, #20c997);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-small {
+            background: #138808;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-small:hover {
+            background: #0f6606;
+            transform: translateY(-1px);
+        }
+        
+        .stats {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-number {
+            color: #ff6b35;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        
+        .no-results h3 {
+            color: #ff6b35;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            input, select, .btn {
+                width: 100%;
+            }
+            
+            .companies-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🇮🇳 Indian Business Directory</h1>
+            <p class="subtitle">Discover 1.1+ Million Indian Companies Across All States</p>
+        </header>
+        
+        <div class="stats">
+            <div class="stat-number" id="totalCompanies">1,142,600</div>
+            <div>Companies Listed Across India</div>
+        </div>
+        
+        <div class="search-section">
+            <form class="search-form" id="searchForm">
+                <input type="text" id="searchQuery" placeholder="Search companies, directors, or locations...">
+                <select id="stateFilter">
+                    <option value="">All States</option>
+                </select>
+                <select id="districtFilter">
+                    <option value="">All Districts</option>
+                </select>
+                <button type="submit" class="btn">Search</button>
+                <button type="button" class="btn" onclick="clearSearch()">Clear</button>
+            </form>
+        </div>
+        
+        <div id="companiesContainer">
+            <div class="loading">Loading companies...</div>
+        </div>
+    </div>
+
+    <script>
+        let companiesData = [];
+        let statesData = [];
+        let filteredCompanies = [];
+        let currentPage = 1;
+        const companiesPerPage = 20; // Increased for better performance with large dataset
+        let isLoading = false;
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatesData();
+            loadCompaniesData();
+        });
+
+        // Load states data
+        async function loadStatesData() {
+            try {
+                const response = await fetch('data/states.json');
+                statesData = await response.json();
+                populateStatesDropdown();
+            } catch (error) {
+                console.log('Loading states from fallback data');
+                statesData = getIndianStates();
+                populateStatesDropdown();
+            }
+        }
+
+        // Load companies data with progress indicator
+        async function loadCompaniesData() {
+            isLoading = true;
+            const container = document.getElementById('companiesContainer');
+            container.innerHTML = `
+                <div class="loading">
+                    <div style="margin-bottom: 20px;">📊 Loading 1.1+ Million Companies...</div>
+                    <div style="color: #ff6b35; font-size: 1rem;">This may take a moment due to the large dataset</div>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('data/companies.json');
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                companiesData = data;
+                filteredCompanies = companiesData;
+                
+                // Update total count
+                document.getElementById('totalCompanies').textContent = companiesData.length.toLocaleString();
+                
+                isLoading = false;
+                displayCompanies();
+                
+                console.log(`✅ Loaded ${companiesData.length.toLocaleString()} companies successfully`);
+            } catch (error) {
+                console.log('Network error, loading sample data for demonstration');
+                companiesData = getSampleCompanies();
+                filteredCompanies = companiesData;
+                isLoading = false;
+                displayCompanies();
+            }
+        }
+
+        // Populate states dropdown
+        function populateStatesDropdown() {
+            const stateSelect = document.getElementById('stateFilter');
+            statesData.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state.name;
+                option.textContent = state.name;
+                stateSelect.appendChild(option);
+            });
+        }
+
+        // Handle state change
+        document.getElementById('stateFilter').addEventListener('change', function() {
+            const selectedState = this.value;
+            const districtSelect = document.getElementById('districtFilter');
+            
+            // Clear districts
+            districtSelect.innerHTML = '<option value="">All Districts</option>';
+            
+            if (selectedState) {
+                const state = statesData.find(s => s.name === selectedState);
+                if (state && state.districts) {
+                    state.districts.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district;
+                        option.textContent = district;
+                        districtSelect.appendChild(option);
+                    });
+                }
+            }
+        });
+
+        // Search functionality
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            performSearch();
+        });
+
+        function performSearch() {
+            if (isLoading) return;
+            
+            const query = document.getElementById('searchQuery').value.toLowerCase().trim();
+            const state = document.getElementById('stateFilter').value;
+            const district = document.getElementById('districtFilter').value;
+
+            // Show loading indicator for large searches
+            const container = document.getElementById('companiesContainer');
+            container.innerHTML = `
+                <div class="loading">
+                    <div>🔍 Searching through ${companiesData.length.toLocaleString()} companies...</div>
+                </div>
+            `;
+
+            // Use setTimeout to prevent UI blocking
+            setTimeout(() => {
+                filteredCompanies = companiesData.filter(company => {
+                    // Fast state filter first (most selective)
+                    if (state && company.state !== state) return false;
+                    if (district && company.district !== district) return false;
+                    
+                    // Text search last (most expensive)
+                    if (query) {
+                        const searchableText = `${company.name} ${company.director} ${company.state} ${company.district} ${company.sector}`.toLowerCase();
+                        if (!searchableText.includes(query)) return false;
+                    }
+                    
+                    return true;
+                });
+
+                currentPage = 1;
+                displayCompanies();
+                
+                // Show search results summary
+                console.log(`Found ${filteredCompanies.length.toLocaleString()} companies matching your criteria`);
+            }, 100);
+        }
+
+        function clearSearch() {
+            document.getElementById('searchQuery').value = '';
+            document.getElementById('stateFilter').value = '';
+            document.getElementById('districtFilter').value = '';
+            document.getElementById('districtFilter').innerHTML = '<option value="">All Districts</option>';
+            
+            filteredCompanies = companiesData;
+            currentPage = 1;
+            displayCompanies();
+        }
+
+        function displayCompanies() {
+            const container = document.getElementById('companiesContainer');
+            
+            if (filteredCompanies.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <h3>No Companies Found</h3>
+                        <p>Try adjusting your search criteria or browse all companies</p>
+                        <button class="btn" onclick="clearSearch()" style="margin-top: 15px;">View All Companies</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const startIndex = (currentPage - 1) * companiesPerPage;
+            const endIndex = startIndex + companiesPerPage;
+            const currentCompanies = filteredCompanies.slice(startIndex, endIndex);
+            
+            // Add search results summary
+            const totalPages = Math.ceil(filteredCompanies.length / companiesPerPage);
+            const showingText = filteredCompanies.length === companiesData.length 
+                ? `Showing ${currentCompanies.length} of ${filteredCompanies.length.toLocaleString()} companies`
+                : `Found ${filteredCompanies.length.toLocaleString()} companies - Showing ${currentCompanies.length} (Page ${currentPage} of ${totalPages.toLocaleString()})`;
+
+            const companiesHTML = currentCompanies.map(company => `
+                <div class="company-card">
+                    <div class="company-name">${company.name}</div>
+                    <div class="company-info">
+                        <div class="info-row">
+                            <span class="info-label">Director:</span>
+                            <span class="info-value">${company.director}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Phone:</span>
+                            <span class="info-value">
+                                <a href="tel:${company.phone}" style="color: #138808; text-decoration: none;">
+                                    ${company.phone}
+                                </a>
+                            </span>
+                        </div>
+                        ${company.email ? `
+                        <div class="info-row">
+                            <span class="info-label">Email:</span>
+                            <span class="info-value">
+                                <a href="mailto:${company.email}" style="color: #138808; text-decoration: none;">
+                                    ${company.email}
+                                </a>
+                            </span>
+                        </div>
+                        ` : ''}
+                        <div class="info-row">
+                            <span class="info-label">Location:</span>
+                            <span class="info-value">${company.district}, ${company.state}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">State:</span>
+                            <span class="state-badge">${company.state}</span>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <a href="tel:${company.phone}" class="btn-small">📞 Call</a>
+                        ${company.email ? `<a href="mailto:${company.email}" class="btn-small">✉️ Email</a>` : ''}
+                        ${company.website ? `<a href="${company.website}" target="_blank" class="btn-small">🌐 Website</a>` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            const paginationHTML = createPagination();
+
+            container.innerHTML = `
+                <div style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+                    <div style="color: #ff6b35; font-weight: bold;">${showingText}</div>
+                </div>
+                <div class="companies-grid">
+                    ${companiesHTML}
+                </div>
+                ${paginationHTML}
+            `;
+        }
+
+        function createPagination() {
+            const totalPages = Math.ceil(filteredCompanies.length / companiesPerPage);
+            if (totalPages <= 1) return '';
+
+            let paginationHTML = '<div style="text-align: center; margin-top: 30px;">';
+            
+            if (currentPage > 1) {
+                paginationHTML += `<button class="btn-small" onclick="changePage(${currentPage - 1})">Previous</button> `;
+            }
+            
+            paginationHTML += `<span style="margin: 0 15px; color: #666;">Page ${currentPage} of ${totalPages}</span>`;
+            
+            if (currentPage < totalPages) {
+                paginationHTML += ` <button class="btn-small" onclick="changePage(${currentPage + 1})">Next</button>`;
+            }
+            
+            paginationHTML += '</div>';
+            return paginationHTML;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            displayCompanies();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Fallback data if files don't load
+        function getIndianStates() {
+            return [
+                { name: "Andhra Pradesh", districts: ["Visakhapatnam", "Vijayawada", "Guntur"] },
+                { name: "Maharashtra", districts: ["Mumbai", "Pune", "Nagpur"] },
+                { name: "Karnataka", districts: ["Bangalore", "Mysore", "Hubli"] },
+                { name: "Tamil Nadu", districts: ["Chennai", "Coimbatore", "Madurai"] },
+                { name: "Gujarat", districts: ["Ahmedabad", "Surat", "Vadodara"] },
+                { name: "Rajasthan", districts: ["Jaipur", "Jodhpur", "Udaipur"] },
+                { name: "West Bengal", districts: ["Kolkata", "Howrah", "Durgapur"] },
+                { name: "Uttar Pradesh", districts: ["Lucknow", "Kanpur", "Agra"] }
+            ];
+        }
+
+        function getSampleCompanies() {
+            return [
+                {
+                    id: 1,
+                    name: "Tech Solutions India",
+                    director: "Rajesh Kumar",
+                    phone: "+91 9876543210",
+                    email: "info@techsolutions.com",
+                    state: "Maharashtra",
+                    district: "Mumbai",
+                    address: "123 Business Park, Mumbai",
+                    website: "https://techsolutions.com"
+                },
+                {
+                    id: 2,
+                    name: "Mumbai Traders",
+                    director: "Priya Sharma",
+                    phone: "+91 9876543211",
+                    email: "contact@mumbaitraders.com",
+                    state: "Maharashtra",
+                    district: "Mumbai",
+                    address: "456 Trade Center, Mumbai"
+                },
+                {
+                    id: 3,
+                    name: "Bangalore IT Services",
+                    director: "Suresh Reddy",
+                    phone: "+91 9876543212",
+                    email: "hello@bangaloreit.com",
+                    state: "Karnataka",
+                    district: "Bangalore",
+                    address: "789 IT Hub, Bangalore",
+                    website: "https://bangaloreit.com"
+                }
+            ];
+        }
+    </script>
+</body>
+</html>
